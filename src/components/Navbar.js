@@ -1,52 +1,42 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const navbarStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '10px'
-};
-
-const linkStyle = {
-  textDecoration: 'none',
-  color: '#fff',
-  backgroundColor: '#525252',
-  padding: '10px 20px',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  marginRight: '10px',
-};
-
-const centerHeadingStyle = {
-  marginLeft: '625px',
-  flex: '1', // Allow it to take up the remaining space
-};
-
-function Navbar({ candidateCount }) {
+function Navbar() {
   const location = useLocation();
-  const [currentPage, setCurrentPage] = React.useState(location.pathname);
 
-  useLocation().pathname !== currentPage && setCurrentPage(location.pathname);
+  const getNavLinks = () => {
+    switch (location.pathname) {
+      case '/candidate/registration':
+        return (
+          <>
+            <Link to="/" data-testid="nav-home-btn">Home</Link>
+            <Link to="/candidate/list" data-testid="nav-list-btn">Candidate List</Link>
+          </>
+        );
+      case '/candidate/list':
+        return (
+          <>
+            <Link to="/" data-testid="nav-home-btn">Home</Link>
+            <Link to="/candidate/registration" data-testid="nav-registration-btn">Candidate Registration</Link>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Link to="/candidate/registration" data-testid="nav-registration-btn">Candidate Registration</Link>
+            <Link to="/candidate/list" data-testid="nav-list-btn">Candidate List</Link>
+          </>
+        );
+    }
+  };
 
   return (
-    <div style={navbarStyle}>
-      <div style={centerHeadingStyle}>
-        <h1 className="header-title" data-testid='header-title'>Job Portal</h1>
-      </div>
-      <div>
-        <Link to="/" style={linkStyle}>Home</Link>
-        {currentPage === '/candidate/registration' ? (
-          <Link to="/candidate/list" style={linkStyle}>
-            Candidate List {candidateCount}
-          </Link>
-        ) : (
-          <Link to="/candidate/registration" style={linkStyle}>
-            Candidate Registration
-          </Link>
-        )}
-      </div>
-    </div>
+    <header>
+      <h1>Job Portal</h1>
+      <nav>
+        {getNavLinks()}
+      </nav>
+    </header>
   );
 }
 

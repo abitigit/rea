@@ -1,202 +1,153 @@
 import React, { useState, useEffect } from 'react';
 
-// Base styles for the component
-const alertMessage = {
-  marginTop: '5px'
-}
-
-const highlight = {
-  border: '2px solid red',
-  backgroundColor: 'red'
-}
-
-
-const centerContainerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '50vh',
-  textAlign: 'center',
-};
-
-const addSkillButtonStyle = {
-  backgroundColor: '#525252',
-  border: '1px solid #333',
-  color: 'white',
-  borderRadius: '5px',
-  marginLeft: '10px',
-  cursor: 'pointer',
-};
-
-const formBoxStyle = {
-  border: '1px solid #ccc',
-  padding: '20px',
-  backgroundColor: '#f5f5f5',
-};
-
-const formGroupStyle = {
-  marginBottom: '10px',
-  display: 'flex',
-  alignItems: 'center',
-};
-
-const sharpEdgeButtonStyle = {
-  backgroundColor: '#525252',
-  border: '1px solid #333',
-  padding: '10px 20px',
-  color: 'white',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  marginTop: '10px',
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '5px',
-  border: '1px solid #ccc',
-  boxSizing: 'border-box',
-};
-
-const skillTagStyle = {
-  backgroundColor: '#333',
-  color: 'white',
-  borderRadius: '0',
-  padding: '5px 10px',
-  margin: '0 5px',
-};
-
-const buttonGroupStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  marginTop: '10px',
-};
-
-function CandidateRegistration() {
-  const [formData, setFormData] = useState({
+function CandidateRegistration({ addCandidate, candidates }) {
+  const initialFormData = {
     name: '',
     email: '',
     role: '',
     skill: '',
     skills: [],
-  });
-
-  const [registrationStatus, setRegistrationStatus] = useState(null);
-  const [candidates, setCandidates] = useState([]);
-  const highlightInput = true; 
-
-  const handleAddSkill = () => {
-    // Hint: Implement this
   };
 
-  const handleFormSubmit = (e) => {
-    // Hint: Implement this
+  const [formData, setFormData] = useState(initialFormData);
+  const [registrationStatus, setRegistrationStatus] = useState(null);
+  const [emailError, setEmailError] = useState(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
+  useEffect(() => {
+    const { name, email, role, skills } = formData;
+    const isValid = name.trim() !== '' && email.trim() !== '' && role.trim() !== '' && skills.length > 0;
+    setIsSubmitDisabled(!isValid);
+  }, [formData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (name === 'email') {
+      setEmailError(false);
+      setRegistrationStatus(null);
+    }
+  };
+
+  const handleAddSkill = () => {
+    if (formData.skill.trim() && formData.skills.length < 5) {
+      setFormData({
+        ...formData,
+        skills: [...formData.skills, formData.skill.trim()],
+        skill: '',
+      });
+    }
   };
 
   const handleReset = () => {
-    // Hint: Implement this
+    setFormData(initialFormData);
+    setRegistrationStatus(null);
+    setEmailError(false);
   };
 
-  useEffect(() => {
-      const storedCandidates = localStorage.getItem('candidates');
-      if (storedCandidates) {
-        // Hint: Implement this
-      }
-    }, []);
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const emailExists = candidates.some(
+      (candidate) => candidate.email.toLowerCase() === formData.email.toLowerCase()
+    );
 
-  useEffect(() => {
-      // Save candidates to localStorage whenever candidates state changes
-      localStorage.setItem('candidates', '');
-    }, [candidates]);
-  
-      
+    if (emailExists) {
+      setRegistrationStatus('Email already exists');
+      setEmailError(true);
+      return;
+    }
+
+    addCandidate({
+      id: Date.now(),
+      name: formData.name,
+      email: formData.email,
+      role: formData.role,
+      skills: formData.skills,
+    });
+    setRegistrationStatus('Candidate profile created');
+    setEmailError(false);
+    setTimeout(() => {
+      handleReset();
+    }, 2000);
+  };
+
   return (
-    <div style={centerContainerStyle}>
-      <div style={formBoxStyle}>
-        <div data-testid='registration-component' style={formBoxStyle}>
-          <form onSubmit={handleFormSubmit}>
-            <div className="form-group" style={formGroupStyle}>
+    <div className="registration-container" data-testid="registration-component">
+      <div className="form-box">
+        <form onSubmit={handleFormSubmit}>
+          <div className="form-group">
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={formData.name}
+              onChange={handleInputChange}
+              data-testid="form-input-name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={emailError ? 'highlight' : ''}
+              data-testid="form-input-email"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              name="role"
+              placeholder="Role"
+              value={formData.role}
+              onChange={handleInputChange}
+              data-testid="form-input-role"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <div className="skill-input-container">
               <input
-                type="text"
-                name="name"
-                value={formData.name}
-                placeholder="Name"
-                required
-                style={inputStyle}
-                data-testid='form-input-name'
-                // onChange={() => {}} - Hint: Implement this
-              />
-            </div>
-            <div className="form-group" style={formGroupStyle}>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                // onChange={() => {}} - Hint: Implement this
-                placeholder="Email"
-                data-testid='form-input-name'
-                required
-                style={{ ...inputStyle, ...(highlightInput ? highlight : {}) }}
-              />
-            </div>
-            <div className="form-group" style={formGroupStyle}>
-              <input
-                type="text"
-                name="role"
-                value={formData.role}
-                // onChange={() => {}} - Hint: Implement this
-                placeholder="Role"
-                required
-                style={inputStyle}
-              />
-            </div>
-            <div className="form-group" style={formGroupStyle}>
-              <input
-                data-testid="form-input-skill"
                 type="text"
                 name="skill"
-                value=""
                 placeholder="Skill"
-                style={inputStyle}
+                value={formData.skill}
+                onChange={handleInputChange}
+                data-testid="form-input-skill"
               />
-              <button
-                type="button"
-                data-testid="add-btn"
-                style={addSkillButtonStyle}
-              >
+              <button type="button" onClick={handleAddSkill} className="add-skill-btn" data-testid="add-skill-btn">
                 Add Skill
               </button>
             </div>
-            <div>
+            <div className="skill-tag-container">
               {formData.skills.map((skill, index) => (
-                <span data-testid='skill-tag' style={skillTagStyle}>
-                </span>
+                <div key={index} className="skill-tag" data-testid={`skill-tag-${index}`}>
+                  {skill}
+                </div>
               ))}
             </div>
-            <div style={buttonGroupStyle}>
-              <button
-                data-testid="submit-btn"
-                type="submit"
-                style={sharpEdgeButtonStyle}
-              >
-                Register
-              </button>
-              <button
-                data-testid="reset-btn"
-                type="button"
-                style={sharpEdgeButtonStyle}
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-          {registrationStatus && (
-            // Hint: Implement this
-            console.log(registrationStatus)
-          )}
-
-        </div>
+          </div>
+          <div className="button-group">
+            <button type="submit" className="form-button" disabled={isSubmitDisabled} data-testid="register-btn">
+              Register
+            </button>
+            <button type="button" onClick={handleReset} className="form-button" data-testid="reset-btn">
+              Reset
+            </button>
+          </div>
+        </form>
+        {registrationStatus && (
+          <div
+            className={`alert-message ${registrationStatus === 'Candidate profile created' ? 'success' : 'error'}`}
+            data-testid="alert-message"
+          >
+            {registrationStatus}
+          </div>
+        )}
       </div>
     </div>
   );
