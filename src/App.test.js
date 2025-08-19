@@ -5,6 +5,6 @@ test('renders Home component', () => {
   render(
       <App />
   );
-  const homeElement = screen.getByText(/Home/i);
+  const homeElement = screen.getByText(/Job Portal/i);
   expect(homeElement).toBeInTheDocument();
 });

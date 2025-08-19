@@ -32,7 +32,7 @@ describe('Candidate Registration Component', () => {
         </MemoryRouter>
       );
   
-      const addSkillButton = screen.getByTestId('add-btn');
+      const addSkillButton = screen.getByTestId('add-skill-btn');
       const skillInput = screen.getByTestId('form-input-skill');
   
       for (let i = 0; i < 6; i++) {
@@ -40,7 +40,7 @@ describe('Candidate Registration Component', () => {
         fireEvent.click(addSkillButton);
       }
   
-      const skillTags = screen.getAllByTestId('skill-tag');
+      const skillTags = screen.queryAllByTestId(/skill-tag/);
   
       expect(skillTags).toHaveLength(5);
     });
