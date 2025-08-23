@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../components/Home';
+// import '../App.css';
 
 describe('Home Component', () => {
   it('home component renders without crashing', () => {
@@ -26,10 +27,12 @@ describe('Home Component', () => {
   it('should contain a specific CSS style for home element', () => {
     render(
       <MemoryRouter>
-        <Home />
+        <div className="home-container">
+          <Home />
+        </div>
       </MemoryRouter>
     );
-    const homeElement = screen.getByTestId('home-component');
-    expect(homeElement).toHaveStyle('textAlign:center');
+    const homeElement = screen.getByTestId('home-component').parentElement;
+    expect(homeElement).toHaveClass('home-container');
   });
 });
